@@ -8,9 +8,9 @@ export type Guardian = {
   fatherName: string;
   fatherOccupation: string;
   fatherContactNo: string;
-  matherName: string;
-  matherOccupation: string;
-  matherContactNo: string;
+  motherName: string;
+  motherOccupation: string;
+  motherContactNo: string;
 };
 
 export type LocalGuardian = {

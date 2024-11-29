@@ -6,19 +6,26 @@ const createStudent = async (req: Request, res: Response) => {
   try {
     /* -------------------------------------------- */
 
+    /* -- creating a schema validation using zod -- */
+
     /* -------------------------------------------- */
     const { student: studentData } = req.body;
-    const { error } = studentValidationSchema.validate(studentData);
 
-    const result = await StudentServices.createStudentIntoDB(studentData);
+    /* //data validation using JOI
+    const { error, value } = studentValidationSchema.validate(studentData); */
 
-    if (error) {
+    // data validation using ZOD
+    const zodparsedData = studentValidationSchema.parse(studentData);
+
+    const result = await StudentServices.createStudentIntoDB(zodparsedData);
+
+    /* if (error) {
       res.status(500).json({
         success: false,
         message: "Something went wrong.",
         error: error.details,
       });
-    }
+    } */
 
     res.status(200).json({
       success: true,

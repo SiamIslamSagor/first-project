@@ -39,12 +39,20 @@ export type TStudent = {
   isActive: "active" | "blocked";
 };
 
-export type StudentMethods = {
-  isUserExist(id: string): Promise<TStudent | null>;
-};
+/* ------------ FOR CREATING STATIC ----------- */
 
-export type StudentModel = Model<
+export interface StudentModel extends Model<TStudent> {
+  isUserExist(id: string): Promise<TStudent | null>;
+}
+
+/* ----------- FOR CREATING INSTANCE ---------- */
+
+/* export type StudentMethods = {
+  isUserExist(id: string): Promise<TStudent | null>;
+}; */
+
+/* export type StudentModel = Model<
   TStudent,
   Record<string, never>,
   StudentMethods
->;
+>; */

@@ -182,7 +182,24 @@ studentSchema.post("save", function (doc, next) {
 /* ------------- QUERY MIDDLEWARE ------------- */
 
 studentSchema.pre("find", function (next) {
-  console.log(this);
+  // ignore those doc which is deleted by chining with original query (like filter!)
+  this.find({ isDeleted: { $ne: true } });
+
+  next();
+});
+
+studentSchema.pre("findOne", function (next) {
+  // ignore those doc which is deleted by chining with original query (like filter!)
+  this.find({ isDeleted: { $ne: true } });
+
+  next();
+});
+
+studentSchema.pre("aggregate", function (next) {
+  // [ { '$match': { $ne: true}}, { '$match': { id: '1227' } } ]
+
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+
   next();
 });
 

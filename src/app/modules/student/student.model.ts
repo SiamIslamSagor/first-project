@@ -87,9 +87,9 @@ const studentSchema = new Schema<TStudent, StudentModel>({
   password: {
     type: String,
     required: [true, "Password is required"],
-    unique: true,
     maxlength: [20, "Password can not be more then 20 characters"],
     minlength: [6, "Password can not be less then 6 characters"],
+    select: false,
   },
   name: {
     type: userNameSchema,
@@ -153,7 +153,13 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     },
     default: "active",
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+/* ------------ DOCUMENT MIDDLEWARE ----------- */
 
 // PRE SAVE MIDDLEWARE/HOOK : will work on create() and save() method
 studentSchema.pre("save", async function (next) {
@@ -167,9 +173,20 @@ studentSchema.pre("save", async function (next) {
 });
 
 // POST SAVE MIDDLEWARE/HOOK
-studentSchema.post("save", function () {
-  console.log(this, "post hook : we saved our data");
+studentSchema.post("save", function (doc, next) {
+  // replaced password to empty string temporary to hide saved password while data is already saved, and it's never affect to db data
+  doc.password = "";
+  next();
 });
+
+/* ------------- QUERY MIDDLEWARE ------------- */
+
+studentSchema.pre("find", function (next) {
+  console.log(this);
+  next();
+});
+
+/* --------------- CUSTOM METHOD -------------- */
 
 // CREATING A CUSTOM STATIC METHOD
 studentSchema.statics.isUserExist = async function (id: string) {

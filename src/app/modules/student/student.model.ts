@@ -1,12 +1,13 @@
 import { model, Schema } from "mongoose";
 import {
+  StudentModel,
   TGuardian,
   TLocalGuardian,
   TStudent,
-  StudentMethods,
-  StudentModel,
   TUserName,
 } from "./student.interface";
+import bcrypt from "bcrypt";
+import config from "../../config";
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -82,7 +83,14 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 });
 
 const studentSchema = new Schema<TStudent, StudentModel>({
-  id: { type: String, required: true, unique: true },
+  id: { type: String, required: [true, "ID is required"], unique: true },
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+    unique: true,
+    maxlength: [20, "Password can not be more then 20 characters"],
+    minlength: [6, "Password can not be less then 6 characters"],
+  },
   name: {
     type: userNameSchema,
     required: [true, "Name is required"],
@@ -145,6 +153,22 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     },
     default: "active",
   },
+});
+
+// PRE SAVE MIDDLEWARE/HOOK : will work on create() and save() method
+studentSchema.pre("save", async function (next) {
+  // encrypt the password and replace the encrypted password to original one
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_round),
+  );
+
+  next();
+});
+
+// POST SAVE MIDDLEWARE/HOOK
+studentSchema.post("save", function () {
+  console.log(this, "post hook : we saved our data");
 });
 
 // CREATING A CUSTOM STATIC METHOD
